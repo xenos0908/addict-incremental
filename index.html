@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addict Incremental</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #101018;
+        }
+
+        header {
+            background-color: #202036;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        main {
+            padding: 1rem;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        hr.solid {
+            border-top: 3px solid white;
+        }
+
+        #tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: #202030;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .tab-button:hover {
+            background-color: #0a0060;
+        }
+
+        .tab-button.active {
+            background-color: #130080;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        #roulette-wheel {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            margin: 200px auto;
+            overflow: hidden; /* Hide the overflow for a clean edge */
+            mask-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+            -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+        }
+
+        #segments-container {
+            display: flex;
+            height: 100%;
+            position: relative;
+        }
+
+        .segment {
+            flex-shrink: 0;
+            width: 80px;
+            height: 100%;
+            margin: 0 0px;
+            background-color: #050509;
+        }
+
+        .segment.red {
+            background-color: #8f0018;
+            text-align: center;
+            color: white;
+        }
+
+        .segment.black {
+            background-color: #050509;
+            text-align: center;
+            color: white;
+        }
+
+        .segment.green {
+            background-color: #00cf18;
+            text-align: center;
+            color: black;
+        }
+
+        #spin-roulette-wheel {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+
+        .spin-roulette-wheel-button {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: #202030;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .spin-roulette-wheel-button:hover {
+            background-color: #0a0060;
+        }
+
+        #roulette-wheel-bet {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+
+        .roulette-bet-button {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: #202030;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .roulette-bet-button.red {
+                background-color: #8f0018;
+        }
+
+        .roulette-bet-button.green {
+                background-color: #008f18;
+        }
+
+        .roulette-bet-button.black {
+            background-color: #050509;
+        }
+
+        .roulette-bet-button.red.active {
+            background-color: #cf0018;
+        }
+
+        .roulette-bet-button.green.active {
+                background-color: #00ff18;
+        }
+
+        .roulette-bet-button.black.active {
+            background-color: #050509;
+        }
+
+        #marker {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background-color: grey;
+            z-index: 10; /* Ensures it's above the segments */
+        }
+
+        #info {
+            display: block;
+            color: white;
+            text-align: center;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1></h1>
+    </header>
+    <main>
+        <div id="info">
+            <h2><span id="dollars">0</span> $</h2>
+            <h3><span id="dollars-per-second">0</span> $ / s</h3>
+            <hr class="solid">
+        </div>
+        <div id="tabs">
+            <button class="tab-button active" onclick="showTab(event, 'roulette')">Roulette</button>
+            <button class="tab-button" onclick="showTab(event, 'black-jack')">Black Jack</button>
+        </div>
+        <div id="tab-contents">
+            <div id="roulette" class="tab-content active">
+                <div id="roulette-wheel">
+                    <div id="marker"></div>
+                    <div id="segments-container">
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment green"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment red"></div>
+                        <div class="segment black"></div>
+                        <div class="segment green"></div>
+                    </div>
+                </div>
+                <div id="spin-roulette-wheel">
+                    <button class="spin-roulette-wheel-button">Spin</button>
+                </div>
+                <div id="roulette-wheel-bet">
+                    <button class="roulette-bet-button red" onclick="changeRouletteBet(event, 'red')"></button>
+                    <button class="roulette-bet-button green" onclick="changeRouletteBet(event, 'green')"></button>
+                    <button class="roulette-bet-button black" onclick="changeRouletteBet(event, 'black')"></button>
+                </div>
+            </div>
+            <div id="black-jack" class="tab-content">
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const container = document.getElementById('segments-container');
+        const segments = container.children;
+        const segmentWidth = 80; // Width of a single segment in px
+        const totalSegments = segments.length;
+        let dollars = 0;
+        let dollarsPerSecond = 1; // Initialize dollars per second to 1
+    
+        // Function to increment dollars based on dollarsPerSecond
+        function incrementDollars() {
+            dollars += dollarsPerSecond / 60; // Increment the dollars by the amount of dollars per second, divided by 60 for each frame
+            document.getElementById('dollars').innerText = dollars.toFixed(2); // Update the displayed dollar value
+            document.getElementById('dollars-per-second').innerText = dollarsPerSecond.toFixed(2); // Update the displayed dollars per second
+        }
+    
+        // Start incrementing dollars 60 times per second
+        setInterval(incrementDollars, 1000 / 60); // 60 times per second (approximately every 16.67ms)
+    
+        // Clone segments for infinite scrolling
+        for (let i = 0; i < 7 * totalSegments; i++) {
+            const clone = segments[i % totalSegments].cloneNode(true);
+            container.appendChild(clone);
+        }
+    
+        let scrollOffset = 0;
+        let isSpinning = false;
+        let scrollInterval;
+    
+        function scrollSegments() {
+            if (isSpinning) return; // Prevent scrolling during spin
+    
+            scrollOffset -= 2; // Adjust speed here
+            const maxScroll = totalSegments * segmentWidth;
+    
+            if (Math.abs(scrollOffset) >= maxScroll / 2) {
+                scrollOffset = 0; // Reset seamlessly
+            }
+    
+            container.style.transform = `translateX(${scrollOffset}px)`;
+        }
+    
+        function startScrolling() {
+            scrollInterval = setInterval(scrollSegments, 16); // 60 FPS
+        }
+    
+        function stopScrolling() {
+            clearInterval(scrollInterval);
+        }
+    
+        function showTab(event, tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+        
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+        
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    
+        function changeRouletteBet(event, betType) {
+            // Remove 'active' class from all bet buttons
+            const betButtons = document.querySelectorAll('.roulette-bet-button');
+            betButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+    
+            // Add 'active' class to the clicked button
+            event.target.classList.add('active');
+    
+            // Change the spin button color to match the selected bet color
+            const spinButton = document.querySelector('.spin-roulette-wheel-button');
+            
+            // Reset the color first (in case we had an active color previously)
+            spinButton.style.backgroundColor = '';
+    
+            // Change the spin button color to the selected bet color
+            if (betType === 'red') {
+                spinButton.style.backgroundColor = '#8f0018'; // Red color
+            } else if (betType === 'green') {
+                spinButton.style.backgroundColor = '#008f18'; // Green color
+            } else if (betType === 'black') {
+                spinButton.style.backgroundColor = '#050509'; // Black color
+            }
+        }
+    
+        function spinToRandomSegment() {
+            if (isSpinning) return; // Prevent multiple spins
+    
+            const betButtons = document.querySelectorAll('.roulette-bet-button');
+            let selectedBet = null;
+            betButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    selectedBet = button.classList[1]; // 'red', 'green', or 'black'
+                }
+            });
+    
+            if (!selectedBet) return; // If no bet is selected, do nothing
+    
+            isSpinning = true;
+            stopScrolling(); // Stop the infinite scroll
+    
+            const offsetAdjustment = segmentWidth / 2; // Half the width of a square
+    
+            const targetSegment = Math.floor(Math.random() * totalSegments); // Pick a random segment (correct range)
+            const targetScroll = -targetSegment * segmentWidth + offsetAdjustment;
+    
+            const totalRevolutions = 10; // Increase revolutions for a longer spin
+            const extraScroll = totalRevolutions * (totalSegments * segmentWidth) / 2;
+            const finalScroll = targetScroll - extraScroll;
+    
+            let startScroll = scrollOffset;
+            const spinDuration = 14000; // 14 seconds for a long spin
+            const startTime = performance.now();
+    
+            function easeOutQuad(t) {
+                return t * (2 - t); // Easing function for smooth deceleration
+            }
+    
+            function animateSpin(time) {
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / spinDuration, 1);
+                const easedProgress = easeOutQuad(progress);
+    
+                const scrollDelta = easedProgress * (finalScroll - startScroll);
+                const currentPosition = startScroll + scrollDelta;
+    
+                container.style.transform = `translateX(${currentPosition}px)`;
+    
+                if (progress < 1) {
+                    requestAnimationFrame(animateSpin);
+                } else {
+                    scrollOffset = targetScroll % (totalSegments * segmentWidth); // Correct the offset
+    
+                    setTimeout(() => {
+                        isSpinning = false;
+                        startScrolling(); // Resume scrolling after a pause
+    
+                        // Determine the color rolled based on the segment
+                        const segmentIndex = Math.abs(Math.round(targetScroll / segmentWidth) % totalSegments);
+                        let rolledColor = segments[segmentIndex].classList[1]; // Get the class of the rolled segment
+    
+                        // Apply multiplier based on the rolled color
+                        if (rolledColor === 'red' || rolledColor === 'black') {
+                            dollarsPerSecond *= 2; // Double the dollars per second
+                        } else if (rolledColor === 'green') {
+                            dollarsPerSecond *= 14; // 14 times the dollars per second
+                        }
+    
+                        // Update the dollars per second display
+                        document.getElementById('dollars-per-second').innerText = dollarsPerSecond.toFixed(2);
+    
+                        // Clear the selected bet after the spin
+                        betButtons.forEach(button => button.classList.remove('active'));
+                    }, 2000); // Pause for 2 seconds after the spin
+                }
+            }
+    
+            requestAnimationFrame(animateSpin);
+            spinButton.style.backgroundColor = '#202030';
+        }
+    
+        const spinButton = document.querySelector('.spin-roulette-wheel-button');
+        spinButton.addEventListener('click', spinToRandomSegment);
+    
+        // Start infinite scrolling
+        startScrolling();
+    </script>      
+</body>
+</html>
